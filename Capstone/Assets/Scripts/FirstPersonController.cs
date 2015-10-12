@@ -10,16 +10,23 @@ public class FirstPersonController : MonoBehaviour {
     private Transform theTransform;
     private Transform forwardTransform;
     private Transform leftTransform;
+    private Rigidbody theRigidBody;
 
 	// Use this for initialization
 	void Start () {
         theTransform = GetComponent<Transform>();
         forwardTransform = forward.GetComponent<Transform>();
         leftTransform = left.GetComponent<Transform>();
+        theRigidBody = GetComponent<Rigidbody>();
 	}
-	
+
 	// Update is called once per frame
-	void Update () {    
+	void Update () {
+        if (theRigidBody != null)
+        {
+            theRigidBody.velocity = Vector3.zero;
+            theRigidBody.angularVelocity = Vector3.zero;
+        }
         if (Input.anyKey)
         {
             Vector3 forwardVector;
