@@ -9,18 +9,21 @@ public class Node : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        int counter = 0;
-	    foreach (GameObject obj in connections) {
-            if (obj != null)
-            {
-                ++counter;
-            }
-        }
-        numConnections = counter;
+
 	}
 
     public GameObject randomNode()
     {
+        if (numConnections == 0)
+        {
+            foreach (GameObject obj in connections)
+            {
+                if (obj != null)
+                {
+                    ++numConnections;
+                }
+            }
+        }
         return connections[Random.Range(0, numConnections)];
     }
 	
