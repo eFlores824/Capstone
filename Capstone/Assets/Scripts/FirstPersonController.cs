@@ -5,16 +5,18 @@ public class FirstPersonController : MonoBehaviour {
 
     public GameObject forward;
     public GameObject left;
-    public GameObject minimap;
+    public GameObject sceneManger;
     public float speed;
     public bool lit = false;
+    public bool gameOver = false;
 
     private Transform theTransform;
     private Transform forwardTransform;
     private Transform leftTransform;
     private Rigidbody theRigidBody;
-    private MinimapManager miniMapManager;
     private GuardDetection[] guards;
+    private SceneManager manager;
+    private int guardsChecking = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -22,13 +24,14 @@ public class FirstPersonController : MonoBehaviour {
         forwardTransform = forward.GetComponent<Transform>();
         leftTransform = left.GetComponent<Transform>();
         theRigidBody = GetComponent<Rigidbody>();
-        miniMapManager = minimap.GetComponent<MinimapManager>();
         guards = FindObjectsOfType<GuardDetection>();
+        manager = sceneManger.GetComponent<SceneManager>();
+        guardsChecking = guards.Length;
 	}
 
 	// Update is called once per frame
 	void Update () {
-        if (Input.anyKey)
+        if (Input.anyKey && !gameOver)
         {
             Vector3 forwardVector;
             Vector3 leftVector;
@@ -37,22 +40,22 @@ public class FirstPersonController : MonoBehaviour {
             if (Input.GetKey(KeyCode.W))
             {
                 theTransform.position += forwardVector;
-                alertGuards();
+                giveSound();
             }
             if (Input.GetKey(KeyCode.A))
             {
                 theTransform.position += leftVector;
-                alertGuards();
+                giveSound();
             }
             if (Input.GetKey(KeyCode.S))
             {
                 theTransform.position += -forwardVector;
-                alertGuards();
+                giveSound();
             }
             if (Input.GetKey(KeyCode.D))
             {
                 theTransform.position += -leftVector;
-                alertGuards();
+                giveSound();
             }
         }
 	}
@@ -64,7 +67,6 @@ public class FirstPersonController : MonoBehaviour {
             theRigidBody.velocity = Vector3.zero;
             theRigidBody.angularVelocity = Vector3.zero;
         }
-        lit = false;
     }
 
     void OnTriggerEnter(Collider collider)
@@ -72,12 +74,21 @@ public class FirstPersonController : MonoBehaviour {
         Goal theGoal = collider.gameObject.GetComponent<Goal>();
         if (theGoal != null)
         {
-            miniMapManager.removeGoal(theGoal.id);
-            Destroy(collider.gameObject);
+            manager.goalReached(theGoal);
         }
     }
 
-    private void alertGuards()
+    public void guardChecked()
+    {
+        --guardsChecking;
+        if (guardsChecking == 0)
+        {
+            guardsChecking = guards.Length;
+            lit = false;
+        }
+    }
+
+    private void giveSound()
     {
         foreach (GuardDetection g in guards) {
             Vector3 position = g.gameObject.transform.position;

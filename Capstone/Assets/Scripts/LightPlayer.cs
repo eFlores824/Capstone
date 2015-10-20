@@ -24,7 +24,7 @@ public class LightPlayer : MonoBehaviour {
         Vector3 downVector = Vector3.down * (theTransform.position.y - playerTransform.position.y);
         float angleBetween = Mathf.Acos(downVector.magnitude / toPlayerVector.magnitude);
         angleBetween *= 180 / Mathf.PI;
-        if (angleBetween <= theLight.spotAngle - 5)
+        if (angleBetween <= theLight.spotAngle - 5 && toPlayerVector.magnitude <= theLight.range - 0.5)
         {
             playerController.lit = true;
         }
