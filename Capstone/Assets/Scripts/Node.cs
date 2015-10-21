@@ -12,7 +12,10 @@ public class Node : MonoBehaviour {
     private int gameLastTriggered;
     
     private int numConnections;
-    private int currentGame;    
+    private int currentGame;
+
+    public float distance;
+    public Node origin = null;
 
 	// Use this for initialization
 	void Start () {

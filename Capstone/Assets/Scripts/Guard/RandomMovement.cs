@@ -18,7 +18,7 @@ public class RandomMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 newPosition = Vector3.MoveTowards(theTransform.position, objective.transform.position, speed);
+        Vector3 newPosition = Vector3.MoveTowards(theTransform.position, objective.transform.position, speed * Time.deltaTime);
         theTransform.position = newPosition;
         if (theTransform.position == objective.transform.position)
         {

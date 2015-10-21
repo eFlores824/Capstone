@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GuardDetection : MonoBehaviour {
 
-    public GameObject player;
+    public FirstPersonController player;
     public GameObject forward;
     public float angleOfDetection;
     public float distanceOfDetection;
@@ -12,16 +12,14 @@ public class GuardDetection : MonoBehaviour {
 
     private Transform playerTransform;
     private Transform forwardTransform;
-    private Transform theTranform;
-    private FirstPersonController playerController;
+    private Transform theTransform;
     private InfoManager info;
 
 	// Use this for initialization
 	void Start () {
         playerTransform = player.GetComponent<Transform>();
         forwardTransform = forward.GetComponent<Transform>();
-        theTranform = GetComponent<Transform>();
-        playerController = player.GetComponent<FirstPersonController>();
+        theTransform = GetComponent<Transform>();
         info = FindObjectOfType<InfoManager>();
 	}
 	
@@ -29,17 +27,17 @@ public class GuardDetection : MonoBehaviour {
 	void Update () {
         if (!gameOver)
         {
-            Vector3 forwardVector = forwardTransform.position - theTranform.position;
-            Vector3 toPlayerVector = playerTransform.position - theTranform.position;
+            Vector3 forwardVector = forwardTransform.position - theTransform.position;
+            Vector3 toPlayerVector = playerTransform.position - theTransform.position;
             float dot = Vector3.Dot(forwardVector, toPlayerVector);
             float lengthsCombined = forwardVector.magnitude * toPlayerVector.magnitude;
             float angle = Mathf.Acos(dot / lengthsCombined);
             if (Mathf.Abs(angle) <= angleOfDetection && toPlayerVector.magnitude <= distanceOfDetection)
             {
                 Vector3 toGoalVector = toPlayerVector.normalized * (toPlayerVector.magnitude);
-                if (!Physics.Raycast(theTranform.position, toPlayerVector, toGoalVector.magnitude))
+                if (!Physics.Raycast(theTransform.position, toPlayerVector, toGoalVector.magnitude))
                 {
-                    if (playerController.lit)
+                    if (player.lit)
                     {
                         Node nearest = info.nearestNode(playerTransform.position);
                         nearest.incrementPlayerFound();
@@ -47,14 +45,13 @@ public class GuardDetection : MonoBehaviour {
                     }
                 }           
             }
-            playerController.guardChecked();
+            player.guardChecked();
         }
 	}
 
     public void alert()
     {
-        Node nearest = info.nearestNode(theTranform.position);
-        nearest.incrementSoundTriggered();
-        //Alerted movement
+        Node nearest = info.nearestNode(playerTransform.position);
+        //nearest.incrementSoundTriggered();
     }
 }

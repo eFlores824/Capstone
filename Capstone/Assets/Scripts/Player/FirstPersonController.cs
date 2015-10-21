@@ -5,7 +5,7 @@ public class FirstPersonController : MonoBehaviour {
 
     public GameObject forward;
     public GameObject left;
-    public GameObject sceneManger;
+    public SceneManager sceneManager;
     public float speed;
     public bool lit = false;
     public bool gameOver = false;
@@ -15,7 +15,6 @@ public class FirstPersonController : MonoBehaviour {
     private Transform leftTransform;
     private Rigidbody theRigidBody;
     private GuardDetection[] guards;
-    private SceneManager manager;
     private int guardsChecking = 0;
 
 	// Use this for initialization
@@ -25,7 +24,6 @@ public class FirstPersonController : MonoBehaviour {
         leftTransform = left.GetComponent<Transform>();
         theRigidBody = GetComponent<Rigidbody>();
         guards = FindObjectsOfType<GuardDetection>();
-        manager = sceneManger.GetComponent<SceneManager>();
         guardsChecking = guards.Length;
 	}
 
@@ -74,7 +72,7 @@ public class FirstPersonController : MonoBehaviour {
         Goal theGoal = collider.gameObject.GetComponent<Goal>();
         if (theGoal != null)
         {
-            manager.goalReached(theGoal);
+            sceneManager.goalReached(theGoal);
         }
     }
 

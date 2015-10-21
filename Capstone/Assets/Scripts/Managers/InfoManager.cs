@@ -10,7 +10,7 @@ public class InfoManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         nodes = FindObjectsOfType<Node>();
-        readNodes();
+        //readNodes();
 	}
 	
 	// Update is called once per frame

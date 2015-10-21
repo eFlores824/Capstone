@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class OptimalTraveral : MonoBehaviour {
-
-    private Node goal;
-    private Node[] path;
+public class GuardManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -15,9 +12,4 @@ public class OptimalTraveral : MonoBehaviour {
 	void Update () {
 	
 	}
-
-    private void optimalPath(Node beginning)
-    {
-
-    }
 }
