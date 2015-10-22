@@ -8,12 +8,15 @@ public class GuardDetection : MonoBehaviour {
     public float angleOfDetection;
     public float distanceOfDetection;
     public float hearingRange;
+    public float hearingDelay;
     public bool gameOver;
 
     private Transform playerTransform;
     private Transform forwardTransform;
     private Transform theTransform;
     private InfoManager info;
+    private float soundTime;
+    private bool countingTime = false;
 
 	// Use this for initialization
 	void Start () {
@@ -47,11 +50,29 @@ public class GuardDetection : MonoBehaviour {
             }
             player.guardChecked();
         }
+        if (countingTime)
+        {
+            soundTime += Time.deltaTime;
+            if (soundTime >= hearingDelay)
+            {
+                soundTime = 0.0f;
+                countingTime = false;
+            }
+        }
 	}
 
     public void alert()
     {
-        Node nearest = info.nearestNode(playerTransform.position);
-        //nearest.incrementSoundTriggered();
+        if (!countingTime)
+        {
+            Node nearest = info.nearestNode(playerTransform.position);
+            nearest.incrementSoundTriggered();
+            countingTime = true;
+        }        
+    }
+
+    public void goalReached(int goalID)
+    {
+
     }
 }

@@ -6,11 +6,16 @@ public class InfoManager : MonoBehaviour {
 
     private Node[] nodes;
     private float timePassedSinceGoal = 0.0f;
+    private int[] goalReachedOrder = new int[4];
+    private float[] timeBetweenGoals = new float[4];
+
+    private int currentGoalIndex = 0;
+    private int currentTimeIndex = 0;
 
 	// Use this for initialization
 	void Start () {
         nodes = FindObjectsOfType<Node>();
-        //readNodes();
+        load();
 	}
 	
 	// Update is called once per frame
@@ -55,12 +60,94 @@ public class InfoManager : MonoBehaviour {
     public void save()
     {
         writeNodes();
+        writeGoals();
     }
 
-    public void goalReached()
+    private void load()
     {
+        //readGoals();
+        readNodes();
+    }
+
+    public void goalReached(int reached)
+    {
+        goalReachedOrder[currentGoalIndex++] = reached;
+        timeBetweenGoals[currentTimeIndex++] = timePassedSinceGoal;
         timePassedSinceGoal = 0.0f;
-        //save the time passed
+    }
+
+    private void writeGoals()
+    {
+        StringBuilder builder = new StringBuilder();
+        string alreadyFound = PlayerPrefs.GetString("GoalsOrder");
+        if (!string.IsNullOrEmpty(alreadyFound))
+        {
+            builder.Append(alreadyFound);
+            builder.Append('\n');
+        }
+        for (int i = 0; i < goalReachedOrder.Length; ++i)
+        {
+            builder.Append(goalReachedOrder[i]);
+            if (i != goalReachedOrder.Length - 1)
+            {
+                builder.Append("-");
+            }
+        }
+        PlayerPrefs.SetString("GoalsOrder", builder.ToString());
+        
+        builder = new StringBuilder();
+        alreadyFound = PlayerPrefs.GetString("GoalsTime");
+        if (!string.IsNullOrEmpty(alreadyFound))
+        {
+            builder.Append(alreadyFound);
+            builder.Append('\n');
+        }
+        for (int i = 0; i < timeBetweenGoals.Length; ++i)
+        {
+            builder.Append(timeBetweenGoals[i]);
+            if (i != timeBetweenGoals.Length - 1)
+            {
+                builder.Append("-");
+            }
+        }
+        PlayerPrefs.SetString("GoalsTime", builder.ToString());
+        PlayerPrefs.Save();
+    }
+
+    private void readGoals()
+    {
+        string goalsReached = PlayerPrefs.GetString("GoalsOrder");
+        string[] eachGame = goalsReached.Split(new char[] {'\n'});
+        foreach (string s in eachGame)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                continue;
+            }
+            int[] orderReached = new int[4];
+            string[] eachGoal = s.Split(new char[] {'-'});
+            for (int i = 0; i < eachGoal.Length; ++i)
+            {
+                orderReached[i] = int.Parse(eachGoal[i]);
+            }
+        }
+
+        string timesBetween = PlayerPrefs.GetString("GoalsTime");
+        eachGame = timesBetween.Split(new char[] {'\n'});
+        foreach (string s in eachGame)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                continue;
+            }
+            float[] timeBetweenGoals = new float[4];
+            string[] eachTime = s.Split(new char[] {'-'});
+            for (int i = 0; i < eachTime.Length; ++i)
+            {
+                timeBetweenGoals[i] = float.Parse(eachTime[i]);
+            }
+        }
+
     }
 
     private void writeNodes()
@@ -81,7 +168,13 @@ public class InfoManager : MonoBehaviour {
     private void readNodes()
     {
         int currentGame = PlayerPrefs.GetInt("GameCount") + 1;
+        PlayerPrefs.SetInt("GameCount", currentGame + 1);
+        PlayerPrefs.Save();
         string nodesString = PlayerPrefs.GetString("Nodes");
+        if (string.IsNullOrEmpty(nodesString))
+        {
+            return;
+        }
         string[] eachNode = nodesString.Split(new char[] { '\n' });
         foreach (string s in eachNode)
         {
@@ -93,7 +186,6 @@ public class InfoManager : MonoBehaviour {
             Node theNode = findNode(id);
             theNode.setInfo(soundCount, foundCount, lastTriggered, currentGame);
         }
-        PlayerPrefs.SetInt("GameCount", currentGame + 1);
     }
 
 }

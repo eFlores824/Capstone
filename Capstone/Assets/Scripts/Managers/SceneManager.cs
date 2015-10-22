@@ -30,7 +30,7 @@ public class SceneManager : MonoBehaviour {
         miniMapManager.removeGoal(theGoal.id);
         Destroy(theGoal.gameObject);
         ++goalsReached;
-        info.goalReached();
+        info.goalReached(theGoal.id);
         if (goalsReached == 4)
         {
             endText.text = "YOU WIN THIS TIME";
