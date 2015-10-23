@@ -1,0 +1,32 @@
+Mono path[0] = 'C:/Users/Eduardo Flores/Documents/Capstone/Capstone/Capstone_Data/Managed'
+Mono path[1] = 'C:/Users/Eduardo Flores/Documents/Capstone/Capstone/Capstone_Data/Mono'
+Mono config path = 'C:/Users/Eduardo Flores/Documents/Capstone/Capstone/Capstone_Data/Mono/etc'
+PlayerConnection initialized from C:/Users/Eduardo Flores/Documents/Capstone/Capstone/Capstone_Data (debug = 0)
+PlayerConnection initialized network socket : 0.0.0.0 55509
+Multi-casting "[IP] 10.10.16.60 [Port] 55509 [Flags] 3 [Guid] 1934250074 [EditorId] 3222823261 [Version] 1048832 [Id] WindowsPlayer(IT-R8QG1JTLR9O1) [Debug] 1" to [225.0.0.222:54997]...
+Waiting for connection from host on [10.10.16.60:55509]...
+PlayerConnection accepted from [10.10.16.60] handle:0x1f4
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,defer=y,address=0.0.0.0:56074
+PlayerConnection already initialized - listening to [10.10.16.60:55509]
+Initialize engine version: 5.2.1f1 (44735ea161b3)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA Quadro K2000M  (ID=0xffb)
+    Vendor:   NVIDIA
+    VRAM:     1994 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: C:\Users\Eduardo Flores\Documents\Capstone\Capstone\Capstone_Data\Managed\System.Core.dll (this message is harmless)
+- Completed reload, in  0.049 seconds
+desktop: 1920x1080 50Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+Waiting for finish

@@ -16,6 +16,7 @@ public class FirstPersonController : MonoBehaviour {
     private Rigidbody theRigidBody;
     private GuardDetection[] guards;
     private int guardsChecking = 0;
+    private bool using360Controller = false;
 
 	// Use this for initialization
 	void Start () {
@@ -25,11 +26,25 @@ public class FirstPersonController : MonoBehaviour {
         theRigidBody = GetComponent<Rigidbody>();
         guards = FindObjectsOfType<GuardDetection>();
         guardsChecking = guards.Length;
+        using360Controller = !string.IsNullOrEmpty(Input.GetJoystickNames()[0]);
 	}
 
 	// Update is called once per frame
 	void Update () {
-        if (Input.anyKey && !gameOver)
+        if (gameOver)
+        {
+            return;
+        }
+        if (using360Controller)
+        {
+            Vector3 forwardVector;
+            Vector3 leftVector;
+            forwardVector = (forwardTransform.position - theTransform.position).normalized;
+            leftVector = (leftTransform.position - theTransform.position).normalized;
+            theTransform.position += forwardVector * -(Input.GetAxis("LeftJoystickY") * speed);
+            theTransform.position += leftVector * -(Input.GetAxis("LeftJoystickX") * speed);
+        }
+        else if (Input.anyKey)
         {
             Vector3 forwardVector;
             Vector3 leftVector;

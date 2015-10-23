@@ -36,6 +36,7 @@ public class SceneManager : MonoBehaviour {
             endText.text = "YOU WIN THIS TIME";
             FindObjectOfType<FirstPersonController>().gameOver = true;
             overScreen.SetActive(true);
+            info.save();
         }
     }
 
@@ -49,11 +50,11 @@ public class SceneManager : MonoBehaviour {
         endText.text = "YOU WERE CAUGHT";
         FindObjectOfType<FirstPersonController>().gameOver = true;
         overScreen.SetActive(true);
+        info.save();
     }
 
     public void reloadLevel()
     {
-        info.save();
         Application.LoadLevel("MainScene");
     }
 }

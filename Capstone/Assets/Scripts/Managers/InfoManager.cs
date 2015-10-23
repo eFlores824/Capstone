@@ -5,9 +5,13 @@ using System.Text;
 public class InfoManager : MonoBehaviour {
 
     private Node[] nodes;
+
     private float timePassedSinceGoal = 0.0f;
     private int[] goalReachedOrder = new int[4];
     private float[] timeBetweenGoals = new float[4];
+
+    private int[][] theOrders;
+    private float[][] theTimes;
 
     private int currentGoalIndex = 0;
     private int currentTimeIndex = 0;
@@ -65,7 +69,7 @@ public class InfoManager : MonoBehaviour {
 
     private void load()
     {
-        //readGoals();
+        readGoals();
         readNodes();
     }
 
@@ -118,6 +122,8 @@ public class InfoManager : MonoBehaviour {
     {
         string goalsReached = PlayerPrefs.GetString("GoalsOrder");
         string[] eachGame = goalsReached.Split(new char[] {'\n'});
+        theOrders = new int[eachGame.Length][];
+        int currentOrder = 0;
         foreach (string s in eachGame)
         {
             if (string.IsNullOrEmpty(s))
@@ -130,10 +136,13 @@ public class InfoManager : MonoBehaviour {
             {
                 orderReached[i] = int.Parse(eachGoal[i]);
             }
+            theOrders[currentOrder++] = orderReached;
         }
 
         string timesBetween = PlayerPrefs.GetString("GoalsTime");
         eachGame = timesBetween.Split(new char[] {'\n'});
+        theTimes = new float[eachGame.Length][];
+        int currentTime = 0;
         foreach (string s in eachGame)
         {
             if (string.IsNullOrEmpty(s))
@@ -146,6 +155,7 @@ public class InfoManager : MonoBehaviour {
             {
                 timeBetweenGoals[i] = float.Parse(eachTime[i]);
             }
+            theTimes[currentTime++] = timeBetweenGoals;
         }
 
     }
