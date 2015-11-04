@@ -13,21 +13,23 @@ public class CameraControl : MonoBehaviour {
 
     void Start()
     {
-        if (OVRManager.isHmdPresent)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        //if (OVRManager.isHmdPresent)
+        //{
+        //    Destroy(gameObject);
+        //    return;
+        //}
         playerTransform = player.GetComponent<Transform>();
         theTransform = GetComponent<Transform>();
-        using360Controller = !string.IsNullOrEmpty(Input.GetJoystickNames()[0]);
+        foreach (string s in Input.GetJoystickNames())
+        {
+            using360Controller = !string.IsNullOrEmpty(s);
+        }
     }
     
     // Update is called once per frame
     void Update()
     {
         float xRotation = 0.0f;
-        transform.position = player.transform.position;
         if (using360Controller)
         {
             xRotation = theTransform.localEulerAngles.y + (Input.GetAxis("RightJoystickX") * sensitivity / 2);
@@ -46,5 +48,10 @@ public class CameraControl : MonoBehaviour {
             Vector3 formerEulerAngles = playerTransform.localEulerAngles;
             playerTransform.localEulerAngles = new Vector3(formerEulerAngles.x, theTransform.localEulerAngles.y, formerEulerAngles.z);
         }
+    }
+
+    void LateUpdate()
+    {
+        transform.position = player.transform.position;
     }
 }

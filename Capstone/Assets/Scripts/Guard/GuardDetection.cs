@@ -25,9 +25,9 @@ public class GuardDetection : MonoBehaviour {
         theTransform = GetComponent<Transform>();
         info = FindObjectOfType<InfoManager>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    public void realUpdate()
+    {
         if (!gameOver)
         {
             Vector3 forwardVector = forwardTransform.position - theTransform.position;
@@ -46,9 +46,8 @@ public class GuardDetection : MonoBehaviour {
                         nearest.incrementPlayerFound();
                         FindObjectOfType<SceneManager>().playerFound();
                     }
-                }           
+                }
             }
-            player.guardChecked();
         }
         if (countingTime)
         {
@@ -59,20 +58,10 @@ public class GuardDetection : MonoBehaviour {
                 countingTime = false;
             }
         }
+    }
+	
+	// Update is called once per frame
+	void Update () {
+        
 	}
-
-    public void alert()
-    {
-        if (!countingTime)
-        {
-            Node nearest = info.nearestNode(playerTransform.position);
-            nearest.incrementSoundTriggered();
-            countingTime = true;
-        }        
-    }
-
-    public void goalReached(int goalID)
-    {
-
-    }
 }

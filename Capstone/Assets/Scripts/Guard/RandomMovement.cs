@@ -8,9 +8,11 @@ public class RandomMovement : MonoBehaviour {
 
     public GameObject objective;
     private Transform theTransform;
+    private GuardDetection detector;
 
 	// Use this for initialization
 	void Start () {
+        detector = GetComponent<GuardDetection>();
         theTransform = GetComponent<Transform>();
         objective = objective.GetComponent<Node>().randomNode();
         checkDirection();
@@ -18,12 +20,15 @@ public class RandomMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 newPosition = Vector3.MoveTowards(theTransform.position, objective.transform.position, speed * Time.deltaTime);
-        theTransform.position = newPosition;
-        if (theTransform.position == objective.transform.position)
+        if (!detector.gameOver)
         {
-            objective = objective.GetComponent<Node>().randomNode();
-            checkDirection();
+            Vector3 newPosition = Vector3.MoveTowards(theTransform.position, objective.transform.position, speed * Time.deltaTime);
+            theTransform.position = newPosition;
+            if (theTransform.position == objective.transform.position)
+            {
+                objective = objective.GetComponent<Node>().randomNode();
+                checkDirection();
+            }
         }
 	}
 

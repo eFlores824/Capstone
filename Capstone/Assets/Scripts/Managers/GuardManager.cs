@@ -14,12 +14,4 @@ public class GuardManager : MonoBehaviour {
 	void Update () {
 	
 	}
-
-    public void objectiveReachedAlert(int goalID)
-    {
-        foreach (GuardDetection guard in guards)
-        {
-            guard.goalReached(goalID);
-        }
-    }
 }

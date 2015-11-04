@@ -18,8 +18,9 @@ public class InfoManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        PlayerPrefs.DeleteAll();
         nodes = FindObjectsOfType<Node>();
-        load();
+        //load();
 	}
 	
 	// Update is called once per frame
@@ -63,8 +64,8 @@ public class InfoManager : MonoBehaviour {
 
     public void save()
     {
-        writeNodes();
-        writeGoals();
+        //writeNodes();
+        //writeGoals();
     }
 
     private void load()
@@ -196,6 +197,36 @@ public class InfoManager : MonoBehaviour {
             Node theNode = findNode(id);
             theNode.setInfo(soundCount, foundCount, lastTriggered, currentGame);
         }
+    }
+
+    private Node[] optimalNodes()
+    {
+        Node first = new Node();
+        Node second = new Node();
+        Node third = new Node();
+        Node fourth = new Node();
+        foreach (Node n in nodes)
+        {
+            float nWeight = n.Weight;
+            if (nWeight > first.Weight)
+            {
+                first = n;
+            }
+            else if (nWeight > second.Weight)
+            {
+                second = n;
+            }
+            else if (nWeight > third.Weight)
+            {
+                third = n;
+            }
+            else if (nWeight > fourth.Weight)
+            {
+                fourth = n;
+            }
+        }
+        Node[] results = new Node[] { first, second, third, fourth};
+        return results;
     }
 
 }

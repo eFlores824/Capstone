@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class SceneManager : MonoBehaviour {
 
     public GameObject hud;
@@ -13,16 +14,29 @@ public class SceneManager : MonoBehaviour {
     private InfoManager info;
     private int goalsReached = 0;
 
+    private GuardDetection[] guards;
+    private LightPlayer[] lights;
+
 	// Use this for initialization
 	void Start () {
         miniMapManager = hud.GetComponent<MinimapManager>();
         endText = overText.GetComponent<Text>();
         info = GetComponent<InfoManager>();
+
+        guards = FindObjectsOfType<GuardDetection>();
+        lights = FindObjectsOfType<LightPlayer>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
+        foreach (LightPlayer light in lights)
+        {
+            light.realUpdate();
+        }
+        foreach (GuardDetection guard in guards)
+        {
+            guard.realUpdate();
+        }
 	}
 
     public void goalReached(Goal theGoal)

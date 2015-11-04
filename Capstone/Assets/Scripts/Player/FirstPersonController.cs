@@ -15,8 +15,14 @@ public class FirstPersonController : MonoBehaviour {
     private Transform leftTransform;
     private Rigidbody theRigidBody;
     private GuardDetection[] guards;
-    private int guardsChecking = 0;
     private bool using360Controller = false;
+    
+    private enum RunningState
+    {
+        normal, running, silent
+    }
+
+    private RunningState running = RunningState.normal;
 
 	// Use this for initialization
 	void Start () {
@@ -25,8 +31,10 @@ public class FirstPersonController : MonoBehaviour {
         leftTransform = left.GetComponent<Transform>();
         theRigidBody = GetComponent<Rigidbody>();
         guards = FindObjectsOfType<GuardDetection>();
-        guardsChecking = guards.Length;
-        using360Controller = !string.IsNullOrEmpty(Input.GetJoystickNames()[0]);
+        foreach (string s in Input.GetJoystickNames())
+        {
+            using360Controller = !string.IsNullOrEmpty(s);
+        }
 	}
 
 	// Update is called once per frame
@@ -41,15 +49,45 @@ public class FirstPersonController : MonoBehaviour {
             Vector3 leftVector;
             forwardVector = (forwardTransform.position - theTransform.position).normalized;
             leftVector = (leftTransform.position - theTransform.position).normalized;
-            theTransform.position += forwardVector * -(Input.GetAxis("LeftJoystickY") * speed);
-            theTransform.position += leftVector * -(Input.GetAxis("LeftJoystickX") * speed);
+            float forwardChange = -(Input.GetAxis("LeftJoystickY") * speed);
+            if (Input.GetButton("LeftJoystickDown"))
+            {
+                running = RunningState.running;
+            }
+            if (Mathf.Abs(forwardChange) < 1.0f)
+            {
+                running = RunningState.silent;
+            }
+            float leftChange = -(Input.GetAxis("LeftJoystickX") * speed);
+            theTransform.position += forwardVector * forwardChange;
+            theTransform.position += leftVector * leftChange;
+            if (leftChange > 0.0f || forwardChange > 0.0f)
+            {
+                giveSound();
+            }
         }
         else if (Input.anyKey)
         {
             Vector3 forwardVector;
             Vector3 leftVector;
-            forwardVector = (forwardTransform.position - theTransform.position).normalized * speed;
-            leftVector = (leftTransform.position - theTransform.position).normalized * speed;
+            float theSpeed = speed;
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                theSpeed *= 1.5f;
+                running = RunningState.running;
+            }
+            else if (Input.GetKey(KeyCode.Space))
+            {
+                theSpeed /= 2;
+                running = RunningState.silent;
+            }
+            else
+            {
+                running = RunningState.normal;
+            }
+            theSpeed *= Time.deltaTime;
+            forwardVector = (forwardTransform.position - theTransform.position).normalized * theSpeed;
+            leftVector = (leftTransform.position - theTransform.position).normalized * theSpeed;
             if (Input.GetKey(KeyCode.W))
             {
                 theTransform.position += forwardVector;
@@ -80,6 +118,7 @@ public class FirstPersonController : MonoBehaviour {
             theRigidBody.velocity = Vector3.zero;
             theRigidBody.angularVelocity = Vector3.zero;
         }
+        lit = false;
     }
 
     void OnTriggerEnter(Collider collider)
@@ -91,25 +130,29 @@ public class FirstPersonController : MonoBehaviour {
         }
     }
 
-    public void guardChecked()
-    {
-        --guardsChecking;
-        if (guardsChecking == 0)
-        {
-            guardsChecking = guards.Length;
-            lit = false;
-        }
-    }
-
     private void giveSound()
     {
+        bool inRange = false;
         foreach (GuardDetection g in guards) {
             Vector3 position = g.gameObject.transform.position;
             float distance = (position - theTransform.position).magnitude;
-            if (distance <= g.hearingRange)
+            float range = g.hearingRange;
+            switch (running)
             {
-                g.alert();
+                case RunningState.running:
+                    range *= 2;
+                    break;
+                case RunningState.silent:
+                    range /= 2;
+                    break;
+                default:
+                    break;
             }
+            inRange = distance <= range? true: inRange;
+        }
+        if (inRange)
+        {
+            //inform the guardManager
         }
     }
 

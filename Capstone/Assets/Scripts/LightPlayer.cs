@@ -17,9 +17,9 @@ public class LightPlayer : MonoBehaviour {
         playerController = player.GetComponent<FirstPersonController>();
         theLight = GetComponent<Light>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    public void realUpdate()
+    {
         Vector3 toPlayerVector = (playerTransform.position - theTransform.position);
         Vector3 downVector = Vector3.down * (theTransform.position.y - playerTransform.position.y);
         float angleBetween = Mathf.Acos(downVector.magnitude / toPlayerVector.magnitude);
@@ -28,5 +28,10 @@ public class LightPlayer : MonoBehaviour {
         {
             playerController.lit = true;
         }
+    }
+
+	// Update is called once per frame
+	void Update () {
+
 	}
 }

@@ -51,17 +51,11 @@
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Advertisements">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Advertisements.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Analytics">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
@@ -74,34 +68,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\OVR\Moonlight\Scripts\OVRDebugHeadController.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\OVROverlay.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\OVRPlatformMenu.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\OVRTouchpad.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\OVRVolumeControl.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\Utils\OVRChromaticAberration.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\Utils\OVRDebugGraph.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\Utils\OVRInputControl.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\Utils\OVRModeParms.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\Utils\OVRMonoscopic.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\Utils\OVRResetOrientation.cs" />
-    <Compile Include="Assets\OVR\Moonlight\Scripts\Utils\OVRWaitCursor.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRCameraRig.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRCommon.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRDisplay.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRInput.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRManager.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVROnCompleteListener.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRPlugin.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRProfile.cs" />
-    <Compile Include="Assets\OVR\Scripts\OVRTracker.cs" />
-    <Compile Include="Assets\OVR\Scripts\Util\OVRDebugInfo.cs" />
-    <Compile Include="Assets\OVR\Scripts\Util\OVRGamepadController.cs" />
-    <Compile Include="Assets\OVR\Scripts\Util\OVRGridCube.cs" />
-    <Compile Include="Assets\OVR\Scripts\Util\OVRPlayerController.cs" />
-    <Compile Include="Assets\OVR\Scripts\Util\OVRSceneSampleController.cs" />
-    <Compile Include="Assets\OVR\Scripts\Util\OVRScreenFade.cs" />
-    <Compile Include="Assets\OVR\Scripts\Util\OVRTrackerBounds.cs" />
     <Compile Include="Assets\Scripts\Goal.cs" />
     <Compile Include="Assets\Scripts\Guard\GuardDetection.cs" />
     <Compile Include="Assets\Scripts\Guard\OptimalTraversal.cs" />
@@ -116,9 +82,6 @@
     <Compile Include="Assets\Scripts\Player\FirstPersonController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\OVR\Moonlight\Resources\Unlit Transparent Color.shader" />
-    <None Include="Assets\OVR\Moonlight\Shaders\OVRColorRampAlpha.shader" />
-    <None Include="Assets\OVR\Moonlight\Shaders\Unlit Crosshair.shader" />
     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
     <None Include="Assets\Plugins\Android\assets\placeholder.txt" />
   </ItemGroup>
