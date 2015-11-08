@@ -14,4 +14,25 @@ public class GuardManager : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void distributeOnSound(Node soundHeard)
+    {
+        float weightOfNode = soundHeard.Weight;
+        if (weightOfNode > 5)
+        {
+
+        }
+        else if (weightOfNode > 3)
+        {
+
+        }
+        else if (weightOfNode > 1)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
 }

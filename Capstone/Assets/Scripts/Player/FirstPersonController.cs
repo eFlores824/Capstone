@@ -6,6 +6,7 @@ public class FirstPersonController : MonoBehaviour {
     public GameObject forward;
     public GameObject left;
     public SceneManager sceneManager;
+    public GuardManager manager;
     public float speed;
     public bool lit = false;
     public bool gameOver = false;

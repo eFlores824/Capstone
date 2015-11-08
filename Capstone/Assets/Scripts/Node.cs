@@ -88,6 +88,50 @@ public class Node : MonoBehaviour {
         return connections[randomIndex];
     }
 
+    public GameObject[] priorityNodes(int numDesired)
+    {
+        int numberNodes = numDesired > numConnections ? numConnections : numDesired;
+        GameObject[] results = new GameObject[numberNodes];
+        if (numberNodes == numConnections)
+        {
+            for (int i = 0; i < numConnections; ++i)
+            {
+                results[i] = connections[i];
+            }
+        }
+        else
+        {
+            int added = 0;
+            while (added != numberNodes)
+            {
+                float highestWeight = float.MaxValue;
+                int highestIndex = 0;
+                for (int i = 0; i < numConnections; ++i)
+                {
+                    GameObject theObject = connections[i];
+                    Node current = theObject.GetComponent<Node>();
+                    if (current.weight < highestWeight && !containsNode(results, theObject))
+                    {
+                        highestWeight = current.weight;
+                        highestIndex = i;
+                    }
+                }
+                results[added++] = connections[highestIndex];
+            }
+        }
+        return results;
+    }
+
+    private bool containsNode(GameObject[] array, GameObject searching)
+    {
+        bool found = false;
+        foreach (GameObject obj in array)
+        {
+            found = obj.Equals(searching)? true: found;
+        }
+        return found;
+    }
+
     public void setInfo(int soundTriggeredCount, int playerFoundCount, int gameLastTriggered, int currentGame) {
         this.gameLastTriggered = gameLastTriggered;
         this.soundTriggeredCount = soundTriggeredCount;
