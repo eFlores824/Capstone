@@ -15,6 +15,7 @@ public class InfoManager : MonoBehaviour {
 
     private int currentGoalIndex = 0;
     private int currentTimeIndex = 0;
+    private bool orderFound = false;
 
 	// Use this for initialization
 	void Start () {
@@ -81,41 +82,85 @@ public class InfoManager : MonoBehaviour {
         timePassedSinceGoal = 0.0f;
     }
 
+    private void checkGoals()
+    {
+        for (int i = currentGoalIndex; i < goalReachedOrder.Length; ++i)
+        {
+            goalReachedOrder[i] = 0;
+            timeBetweenGoals[i] = float.MaxValue;
+        }
+        foreach (int[] order in theOrders) {
+            if (equalArrays(goalReachedOrder, order))
+            {
+                ++order[4];
+                orderFound = true;
+                break;
+            }
+        }
+        if (!orderFound)
+        {
+
+        }
+    }
+
+    private bool equalArrays(int[] firstArray, int[] secondArray)
+    {
+        for (int i = 0; i < firstArray.Length; ++i)
+        {
+            if (firstArray[i] != secondArray[i])
+                return false;
+        }
+        return true;
+    }
+
     private void writeGoals()
     {
         StringBuilder builder = new StringBuilder();
-        string alreadyFound = PlayerPrefs.GetString("GoalsOrder");
-        if (!string.IsNullOrEmpty(alreadyFound))
-        {
-            builder.Append(alreadyFound);
-            builder.Append('\n');
-        }
-        for (int i = 0; i < goalReachedOrder.Length; ++i)
-        {
-            builder.Append(goalReachedOrder[i]);
-            if (i != goalReachedOrder.Length - 1)
+        for (int j = 0; j < theOrders.Length; ++j) {
+            int[] currentOrder = theOrders[j];
+            for (int i = 0; i < currentOrder.Length; ++i)
             {
-                builder.Append("-");
+                builder.Append(currentOrder[i]);
+                if (i != currentOrder.Length - 1)
+                {
+                    builder.Append("-");
+                }
+            }
+            if (j != theOrders.Length - 1)
+            {
+                builder.Append('\n');
+            }
+        }
+        if (!orderFound)
+        {
+            builder.Append('\n');
+            for (int i = 0; i < goalReachedOrder.Length; ++i)
+            {
+                builder.Append(goalReachedOrder[i]);
+                if (i != goalReachedOrder.Length - 1)
+                {
+                    builder.Append("-");
+                }
             }
         }
         PlayerPrefs.SetString("GoalsOrder", builder.ToString());
         
-        builder = new StringBuilder();
-        alreadyFound = PlayerPrefs.GetString("GoalsTime");
-        if (!string.IsNullOrEmpty(alreadyFound))
-        {
-            builder.Append(alreadyFound);
-            builder.Append('\n');
-        }
-        for (int i = 0; i < timeBetweenGoals.Length; ++i)
-        {
-            builder.Append(timeBetweenGoals[i]);
-            if (i != timeBetweenGoals.Length - 1)
-            {
-                builder.Append("-");
-            }
-        }
-        PlayerPrefs.SetString("GoalsTime", builder.ToString());
+        //builder = new StringBuilder();
+        //string alreadyFound = PlayerPrefs.GetString("GoalsTime");
+        //if (!string.IsNullOrEmpty(alreadyFound))
+        //{
+        //    builder.Append(alreadyFound);
+        //    builder.Append('\n');
+        //}
+        //for (int i = 0; i < timeBetweenGoals.Length; ++i)
+        //{
+        //    builder.Append(timeBetweenGoals[i]);
+        //    if (i != timeBetweenGoals.Length - 1)
+        //    {
+        //        builder.Append("-");
+        //    }
+        //}
+        //PlayerPrefs.SetString("GoalsTime", builder.ToString());
         PlayerPrefs.Save();
     }
 

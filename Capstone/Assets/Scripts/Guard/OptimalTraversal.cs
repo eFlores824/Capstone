@@ -18,13 +18,18 @@ public class OptimalTraversal : MonoBehaviour {
     private GuardDetection detector;
     private GameObject objective;
 
-	// Use this for initialization
-	void Start () {
+    public void realStart()
+    {
         detector = GetComponent<GuardDetection>();
         path = optimalPath(start, destination);
         currentObjective = path[currentNode].transform.position;
         theTransform = GetComponent<Transform>();
         checkDirection(currentObjective);
+    }
+
+	// Use this for initialization
+	void Start () {
+
 	}
 	
 	// Update is called once per frame
@@ -61,6 +66,33 @@ public class OptimalTraversal : MonoBehaviour {
         }
 	}
 
+    public void changeGoal(Node goal)
+    {
+        Node beginning;
+        float closestDistance;
+        if (currentNode < path.Length)
+        {
+            beginning = path[currentNode];
+            closestDistance = (beginning.transform.position - goal.transform.position).magnitude;
+        }
+        else
+        {
+            beginning = objective.GetComponent<Node>();
+            closestDistance = (objective.transform.position - goal.transform.position).magnitude;
+        }
+        foreach (GameObject obj in beginning.connections)
+        {
+            float distanceFrom = (obj.transform.position - goal.transform.position).magnitude;
+            if (distanceFrom < closestDistance)
+            {
+                beginning = obj.GetComponent<Node>();
+            }
+        }
+        //Node[] newPath = mostGoalsPath(beginning, goal);
+        Node[] newPath = optimalPath(beginning, goal);
+        changePath(newPath);
+    }
+
     private void changePath(Node[] newPath)
     {
         path = newPath;
@@ -74,16 +106,14 @@ public class OptimalTraversal : MonoBehaviour {
         IList<Node> open = new List<Node>();
         IList<Node> closed = new List<Node>();
         closed.Add(start);
-        //A* algorithm stuff
+        int counter = 0;
         foreach (GameObject g in start.connections)
         {
-            if (g != null)
-            {
-                Node n = g.GetComponent<Node>();
-                open.Add(n);
-                n.distance = (start.transform.position - g.transform.position).magnitude;
-                n.origin = start;
-            }
+            Node n = g.GetComponent<Node>();
+            open.Add(n);
+            n.distance = start.connectionLengths[counter];
+            n.origin = start;
+            ++counter;
         }
         while (!closed.Contains(goal))
         {
@@ -104,30 +134,27 @@ public class OptimalTraversal : MonoBehaviour {
             {
                 break;
             }
-            int counter = 0;
+            counter = 0;
             foreach (GameObject g in optimal.connections)
             {
-                if (g != null)
+                Node n = g.GetComponent<Node>();
+                if (!closed.Contains(n))
                 {
-                    Node n = g.GetComponent<Node>();
-                    if (!closed.Contains(n))
+                    //float distanceBetween = (optimal.transform.position - n.transform.position).magnitude;
+                    float distanceBetween = n.connectionLengths[counter];
+                    float possibleDistance = optimal.distance + distanceBetween;
+                    if (!open.Contains(n))
                     {
-                        //float distanceBetween = (optimal.transform.position - n.transform.position).magnitude;
-                        float distanceBetween = n.connectionLengths[counter];
-                        float possibleDistance = optimal.distance + distanceBetween;
-                        if (!open.Contains(n))
+                        n.origin = optimal;
+                        n.distance = possibleDistance;
+                        open.Add(n);
+                    }
+                    else
+                    {
+                        if (possibleDistance < n.distance)
                         {
-                            n.origin = optimal;
                             n.distance = possibleDistance;
-                            open.Add(n);
-                        }
-                        else
-                        {
-                            if (possibleDistance < n.distance)
-                            {
-                                n.distance = possibleDistance;
-                                n.origin = optimal;
-                            }
+                            n.origin = optimal;
                         }
                     }
                 }
@@ -185,7 +212,7 @@ public class OptimalTraversal : MonoBehaviour {
     private int checkConnection(Node a, Node b)
     {
         int nodeConnection = 0;
-        for (int i = 0; i < a.NumConnections; ++i) {
+        for (int i = 0; i < a.connections.Length; ++i) {
             Node connection = a.connections[i].GetComponent<Node>();
             if (connection.Equals(b)) { 
                 nodeConnection = i;

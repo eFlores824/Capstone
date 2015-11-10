@@ -16,6 +16,7 @@ public class FirstPersonController : MonoBehaviour {
     private Transform leftTransform;
     private Rigidbody theRigidBody;
     private GuardDetection[] guards;
+    private InfoManager info;
     private bool using360Controller = false;
     
     private enum RunningState
@@ -32,6 +33,7 @@ public class FirstPersonController : MonoBehaviour {
         leftTransform = left.GetComponent<Transform>();
         theRigidBody = GetComponent<Rigidbody>();
         guards = FindObjectsOfType<GuardDetection>();
+        info = FindObjectOfType<InfoManager>();
         foreach (string s in Input.GetJoystickNames())
         {
             using360Controller = !string.IsNullOrEmpty(s);
@@ -153,7 +155,8 @@ public class FirstPersonController : MonoBehaviour {
         }
         if (inRange)
         {
-            //inform the guardManager
+            Node closestNode = info.nearestNode(theTransform.position);
+            manager.distributeOnSound(closestNode);
         }
     }
 

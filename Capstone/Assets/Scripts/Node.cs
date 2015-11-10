@@ -5,14 +5,13 @@ using System.Text;
 public class Node : MonoBehaviour {
 
     public GameObject[] connections = new GameObject[4];
-    public float[] connectionLengths = new float[4];
+    public float[] connectionLengths;
     
     public int id = 0;
     private int soundTriggeredCount = 0;
     private int playerFoundCount = 0;
     private int gameLastTriggered = 0;
     private float weight = 0.0f;
-    private int numConnections = 0;
     private int currentGame = 0;
 
     public float distance = 0;
@@ -38,24 +37,18 @@ public class Node : MonoBehaviour {
         get { return weight; }
     }
 
-    public int NumConnections
+    public void realStart()
     {
-        get { return numConnections; }
-    }    
-
-	// Use this for initialization
-	void Start () {
-        foreach (GameObject g in connections)
-        {
-            if (g != null)
-            {
-                ++numConnections;
-            }
-        }
-        for (int i = 0; i < numConnections; ++i)
+        connectionLengths = new float[connections.Length];
+        for (int i = 0; i < connections.Length; ++i)
         {
             connectionLengths[i] = (transform.position - connections[i].transform.position).magnitude;
         }
+    }
+
+	// Use this for initialization
+	void Start () {
+        
 	}
 
 	// Update is called once per frame
@@ -65,14 +58,14 @@ public class Node : MonoBehaviour {
 
     public GameObject randomNode()
     {
-        return connections[Random.Range(0, numConnections)];
+        return connections[Random.Range(0, connections.Length)];
     }
 
     public GameObject nodeWithinDistance(Vector3 root, float maxDistance)
     {
-        int[] validNodes = new int[numConnections];
+        int[] validNodes = new int[connections.Length];
         int counter = 0;
-        for (int i = 0; i < numConnections; ++i)
+        for (int i = 0; i < connections.Length; ++i)
         {
             float distanceBetween = (connections[i].transform.position - root).magnitude;
             if (distanceBetween <= maxDistance)
@@ -90,11 +83,11 @@ public class Node : MonoBehaviour {
 
     public GameObject[] priorityNodes(int numDesired)
     {
-        int numberNodes = numDesired > numConnections ? numConnections : numDesired;
+        int numberNodes = numDesired > connections.Length ? connections.Length : numDesired;
         GameObject[] results = new GameObject[numberNodes];
-        if (numberNodes == numConnections)
+        if (numberNodes == connections.Length)
         {
-            for (int i = 0; i < numConnections; ++i)
+            for (int i = 0; i < connections.Length; ++i)
             {
                 results[i] = connections[i];
             }
@@ -106,7 +99,7 @@ public class Node : MonoBehaviour {
             {
                 float highestWeight = float.MaxValue;
                 int highestIndex = 0;
-                for (int i = 0; i < numConnections; ++i)
+                for (int i = 0; i < connections.Length; ++i)
                 {
                     GameObject theObject = connections[i];
                     Node current = theObject.GetComponent<Node>();

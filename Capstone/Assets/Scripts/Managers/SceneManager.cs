@@ -16,6 +16,7 @@ public class SceneManager : MonoBehaviour {
 
     private GuardDetection[] guards;
     private LightPlayer[] lights;
+    private Node[] allNodes;
 
 	// Use this for initialization
 	void Start () {
@@ -25,6 +26,16 @@ public class SceneManager : MonoBehaviour {
 
         guards = FindObjectsOfType<GuardDetection>();
         lights = FindObjectsOfType<LightPlayer>();
+
+        foreach (Node n in allNodes)
+        {
+            n.realStart();
+        }
+        foreach (GuardDetection guard in guards)
+        {
+            OptimalTraversal optimal = guard.GetComponent<OptimalTraversal>();
+            optimal.realStart();
+        }
 	}
 	
 	// Update is called once per frame
