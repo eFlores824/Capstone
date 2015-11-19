@@ -2,16 +2,14 @@
 using System.Collections;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(AudioSource))]
 public class SceneManager : MonoBehaviour {
 
-    public GameObject hud;
     public GameObject overScreen;
-    public GameObject overText;
+    public Text endText;
+    public MinimapManager miniMapManager;
 
-    private MinimapManager miniMapManager;
-    private Text endText;
     private InfoManager info;
+    private SoundManager sound;
     private int goalsReached = 0;
 
     private GuardDetection[] guards;
@@ -20,12 +18,11 @@ public class SceneManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        miniMapManager = hud.GetComponent<MinimapManager>();
-        endText = overText.GetComponent<Text>();
         info = GetComponent<InfoManager>();
-
         guards = FindObjectsOfType<GuardDetection>();
         lights = FindObjectsOfType<LightPlayer>();
+        allNodes = FindObjectsOfType<Node>();
+        sound = GetComponent<SoundManager>();
 
         foreach (Node n in allNodes)
         {
@@ -36,6 +33,10 @@ public class SceneManager : MonoBehaviour {
             OptimalTraversal optimal = guard.GetComponent<OptimalTraversal>();
             optimal.realStart();
         }
+
+        GuardManager headGuard = GetComponent<GuardManager>();
+        info.realStart();
+        headGuard.realStart();
 	}
 	
 	// Update is called once per frame
@@ -52,13 +53,14 @@ public class SceneManager : MonoBehaviour {
 
     public void goalReached(Goal theGoal)
     {
-        miniMapManager.removeGoal(theGoal.id);
+        miniMapManager.removeGoal(theGoal.id - 1);
         Destroy(theGoal.gameObject);
         ++goalsReached;
         info.goalReached(theGoal.id);
         if (goalsReached == 4)
         {
             endText.text = "YOU WIN THIS TIME";
+            sound.stopFootsteps();
             FindObjectOfType<FirstPersonController>().gameOver = true;
             overScreen.SetActive(true);
             info.save();
@@ -72,6 +74,7 @@ public class SceneManager : MonoBehaviour {
         {
             guard.gameOver = true;
         }
+        sound.stopFootsteps();
         endText.text = "YOU WERE CAUGHT";
         FindObjectOfType<FirstPersonController>().gameOver = true;
         overScreen.SetActive(true);

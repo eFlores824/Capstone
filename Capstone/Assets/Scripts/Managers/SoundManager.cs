@@ -1,21 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(AudioSource))]
 public class SoundManager : MonoBehaviour {
 
-	public AudioClip footstep1;
-	public AudioClip footstep2;
-	public AudioClip footstep3;
 	public AudioClip walking;
 	public AudioClip goalReached;
-	public AudioClip backgroundSound;
 
-	private AudioSource sound;
+	private AudioSource[] sounds;
+    private IEnumerator coroutine;
 	
 	// Use this for initialization
 	void Start () {
-		sound = GetComponent<AudioSource>();
+		sounds = GetComponents<AudioSource>();
 	}
 	
 	// Update is called once per frame
@@ -24,47 +20,20 @@ public class SoundManager : MonoBehaviour {
 	}
 	
 	public void playFootsteps() {
-		//StartCoroutine("firstFoot");
-		StartCoroutine("walkingSound");
+        sounds[1].Play();
 	}
 	
 	public void stopFootsteps() {
-		
-	}
-	
-	private IEnumerator walkingSound() {
-		sound.PlayOneShot(walking);
-		yield return new WaitForSeconds(walking.length);
-	}
-	
-	private IEnumerator firstFoot() {
-		sound.PlayOneShot(footstep1);
-		yield return new WaitForSeconds(footstep1.length);
-		StartCoroutine("secondFoot");
-	}
-	
-	private IEnumerator secondFoot() {
-		sound.PlayOneShot(footstep2);
-		yield return new WaitForSeconds(footstep2.length);
-		StartCoroutine("thirdFoot");
-	}
-	
-	private IEnumerator thirdFoot() {
-		sound.PlayOneShot(footstep3);
-		yield return new WaitForSeconds(footstep3.length);
-	}
-	
-	public void playBackgroundMusic() {
-		StartCoroutine("background");
+        sounds[1].Stop();
 	}
 	
 	public void stopAllSound() {
 		StopAllCoroutines();
 	}
-	
-	private IEnumerator background() {
-		sound.PlayOneShot(backgroundSound);
-		yield return new WaitForSeconds(backgroundSound.length);
-		StartCoroutine("background");
-	}
+
+    public void playGoalReached()
+    {
+        sounds[0].PlayOneShot(goalReached);
+    }
+
 }

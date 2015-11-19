@@ -7,6 +7,7 @@ public class FirstPersonController : MonoBehaviour {
     public GameObject left;
     public SceneManager sceneManager;
     public GuardManager manager;
+    public SoundManager sound;
     public float speed;
     public bool lit = false;
     public bool gameOver = false;
@@ -18,6 +19,8 @@ public class FirstPersonController : MonoBehaviour {
     private GuardDetection[] guards;
     private InfoManager info;
     private bool using360Controller = false;
+    private bool wasWalking = false;
+    private bool walking = false;
     
     private enum RunningState
     {
@@ -48,71 +51,101 @@ public class FirstPersonController : MonoBehaviour {
         }
         if (using360Controller)
         {
-            Vector3 forwardVector;
-            Vector3 leftVector;
-            forwardVector = (forwardTransform.position - theTransform.position).normalized;
-            leftVector = (leftTransform.position - theTransform.position).normalized;
-            float forwardChange = -(Input.GetAxis("LeftJoystickY") * speed);
-            if (Input.GetButton("LeftJoystickDown"))
-            {
-                running = RunningState.running;
-            }
-            if (Mathf.Abs(forwardChange) < 1.0f)
-            {
-                running = RunningState.silent;
-            }
-            float leftChange = -(Input.GetAxis("LeftJoystickX") * speed);
-            theTransform.position += forwardVector * forwardChange;
-            theTransform.position += leftVector * leftChange;
-            if (leftChange > 0.0f || forwardChange > 0.0f)
-            {
-                giveSound();
-            }
+            controllerMovement();
         }
         else if (Input.anyKey)
         {
-            Vector3 forwardVector;
-            Vector3 leftVector;
-            float theSpeed = speed;
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                theSpeed *= 1.5f;
-                running = RunningState.running;
-            }
-            else if (Input.GetKey(KeyCode.Space))
-            {
-                theSpeed /= 2;
-                running = RunningState.silent;
-            }
-            else
-            {
-                running = RunningState.normal;
-            }
-            theSpeed *= Time.deltaTime;
-            forwardVector = (forwardTransform.position - theTransform.position).normalized * theSpeed;
-            leftVector = (leftTransform.position - theTransform.position).normalized * theSpeed;
-            if (Input.GetKey(KeyCode.W))
-            {
-                theTransform.position += forwardVector;
-                giveSound();
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                theTransform.position += leftVector;
-                giveSound();
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                theTransform.position += -forwardVector;
-                giveSound();
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                theTransform.position += -leftVector;
-                giveSound();
-            }
+            mouseMovement();
         }
+        else {
+            walking = false;
+        }
+        if (wasWalking && !walking) {
+            sound.stopFootsteps();
+        }
+        else if (!wasWalking && walking)
+        {
+            sound.playFootsteps();
+        }
+        wasWalking = walking;
 	}
+
+    private void controllerMovement()
+    {
+        Vector3 forwardVector;
+        Vector3 leftVector;
+        forwardVector = (forwardTransform.position - theTransform.position).normalized;
+        leftVector = (leftTransform.position - theTransform.position).normalized;
+        float forwardChange = -(Input.GetAxis("LeftJoystickY") * speed * Time.deltaTime);
+        float leftChange = -(Input.GetAxis("LeftJoystickX") * speed * Time.deltaTime);
+        if (Input.GetButton("LeftStickClick"))
+        {
+            running = RunningState.running;
+            forwardChange *= 2.0f;
+            leftChange *= 2.0f;
+        }
+        else if (Mathf.Abs(forwardChange) < 0.05f)
+        {
+            running = RunningState.silent;
+            //forwardChange *= 0.5f;
+            //leftChange *= 0.5f;
+        }
+        theTransform.position += forwardVector * forwardChange;
+        theTransform.position += leftVector * leftChange;
+        if (leftChange > 0.0f || forwardChange > 0.0f)
+        {
+            giveSound();
+        }
+        else
+        {
+            walking = false;
+        }
+    }
+
+    private void mouseMovement()
+    {
+        Vector3 forwardVector;
+        Vector3 leftVector;
+        float theSpeed = speed;
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            theSpeed *= 1.5f;
+            running = RunningState.running;
+        }
+        else if (Input.GetKey(KeyCode.Space))
+        {
+            theSpeed *= 0.5f;
+            running = RunningState.silent;
+        }
+        else
+        {
+            running = RunningState.normal;
+        }
+        theSpeed *= Time.deltaTime;
+        forwardVector = (forwardTransform.position - theTransform.position).normalized * theSpeed;
+        leftVector = (leftTransform.position - theTransform.position).normalized * theSpeed;
+        walking = false;
+        if (Input.GetKey(KeyCode.W))
+        {
+            theTransform.position += forwardVector;
+            giveSound();
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            theTransform.position += leftVector;
+            giveSound();
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            theTransform.position += -forwardVector;
+            giveSound();
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            theTransform.position += -leftVector;
+            giveSound();
+        }
+    }
 
     void LateUpdate()
     {
@@ -130,11 +163,13 @@ public class FirstPersonController : MonoBehaviour {
         if (theGoal != null)
         {
             sceneManager.goalReached(theGoal);
+            sound.playGoalReached();
         }
     }
 
     private void giveSound()
     {
+        walking = true;
         bool inRange = false;
         foreach (GuardDetection g in guards) {
             Vector3 position = g.gameObject.transform.position;

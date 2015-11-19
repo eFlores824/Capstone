@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraControl : MonoBehaviour {
 
-    public float sensitivity = 5.0f;
+    public float sensitivity = 2.0f;
     public GameObject player;
 
     private float yRotation = 0.0f;
@@ -34,7 +34,7 @@ public class CameraControl : MonoBehaviour {
         {
             xRotation = theTransform.localEulerAngles.y + (Input.GetAxis("RightJoystickX") * sensitivity / 2);
             yRotation += -Input.GetAxis("RightJoystickY") * sensitivity / 2;
-            yRotation = Mathf.Clamp(yRotation, -360.0f, 360.0f);
+            yRotation = Mathf.Clamp(yRotation, -90.0f, 90.0f);
             theTransform.localEulerAngles = new Vector3(-yRotation, xRotation, 0);
             Vector3 formerEulerAngles = playerTransform.localEulerAngles;
             playerTransform.localEulerAngles = new Vector3(formerEulerAngles.x, theTransform.localEulerAngles.y, formerEulerAngles.z);

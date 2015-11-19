@@ -35,6 +35,7 @@ public class Node : MonoBehaviour {
     public float Weight
     {
         get { return weight; }
+        set { weight = value; }
     }
 
     public void realStart()
@@ -81,15 +82,15 @@ public class Node : MonoBehaviour {
         return connections[randomIndex];
     }
 
-    public GameObject[] priorityNodes(int numDesired)
+    public Node[] priorityNodes(int numDesired)
     {
         int numberNodes = numDesired > connections.Length ? connections.Length : numDesired;
-        GameObject[] results = new GameObject[numberNodes];
+        Node[] results = new Node[numberNodes];
         if (numberNodes == connections.Length)
         {
             for (int i = 0; i < connections.Length; ++i)
             {
-                results[i] = connections[i];
+                results[i] = connections[i].GetComponent<Node>();
             }
         }
         else
@@ -101,24 +102,23 @@ public class Node : MonoBehaviour {
                 int highestIndex = 0;
                 for (int i = 0; i < connections.Length; ++i)
                 {
-                    GameObject theObject = connections[i];
-                    Node current = theObject.GetComponent<Node>();
-                    if (current.weight < highestWeight && !containsNode(results, theObject))
+                    Node current = connections[i].GetComponent<Node>();
+                    if (current.weight < highestWeight && !containsNode(results, current))
                     {
                         highestWeight = current.weight;
                         highestIndex = i;
                     }
                 }
-                results[added++] = connections[highestIndex];
+                results[added++] = connections[highestIndex].GetComponent<Node>();
             }
         }
         return results;
     }
 
-    private bool containsNode(GameObject[] array, GameObject searching)
+    private bool containsNode(Node[] array, Node searching)
     {
         bool found = false;
-        foreach (GameObject obj in array)
+        foreach (Node obj in array)
         {
             found = obj.Equals(searching)? true: found;
         }

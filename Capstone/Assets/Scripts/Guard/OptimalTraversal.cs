@@ -21,10 +21,7 @@ public class OptimalTraversal : MonoBehaviour {
     public void realStart()
     {
         detector = GetComponent<GuardDetection>();
-        path = optimalPath(start, destination);
-        currentObjective = path[currentNode].transform.position;
         theTransform = GetComponent<Transform>();
-        checkDirection(currentObjective);
     }
 
 	// Use this for initialization
@@ -68,6 +65,11 @@ public class OptimalTraversal : MonoBehaviour {
 
     public void changeGoal(Node goal)
     {
+        if (path == null)
+        {
+            changePath(mostGoalsPath(start, goal, 4));
+            return;
+        }
         Node beginning;
         float closestDistance;
         if (currentNode < path.Length)
@@ -88,8 +90,7 @@ public class OptimalTraversal : MonoBehaviour {
                 beginning = obj.GetComponent<Node>();
             }
         }
-        //Node[] newPath = mostGoalsPath(beginning, goal);
-        Node[] newPath = optimalPath(beginning, goal);
+        Node[] newPath = mostGoalsPath(beginning, goal, 3);
         changePath(newPath);
     }
 
@@ -101,7 +102,7 @@ public class OptimalTraversal : MonoBehaviour {
         checkDirection(currentObjective);
     }
 
-    private Node[] optimalPath(Node start, Node goal)
+    private Node[] AStar(Node start, Node goal, out float totalDistance)
     {
         IList<Node> open = new List<Node>();
         IList<Node> closed = new List<Node>();
@@ -140,8 +141,7 @@ public class OptimalTraversal : MonoBehaviour {
                 Node n = g.GetComponent<Node>();
                 if (!closed.Contains(n))
                 {
-                    //float distanceBetween = (optimal.transform.position - n.transform.position).magnitude;
-                    float distanceBetween = n.connectionLengths[counter];
+                    float distanceBetween = optimal.connectionLengths[counter];
                     float possibleDistance = optimal.distance + distanceBetween;
                     if (!open.Contains(n))
                     {
@@ -169,57 +169,158 @@ public class OptimalTraversal : MonoBehaviour {
             thePath.Push(current);
             current = current.origin;
         }
+        totalDistance = goal.distance;
         resetOrigins();
         return thePath.ToArray();
     }
 
-    private Node[] mostGoalsPath(Node start, Node goal)
+    private Node[][] Yens(Node start, Node goal, int numPaths)
     {
-        Node[] bestPath = optimalPath(start, goal);
-        int numPaths = 3;
-        if (bestPath.Length - 1 < numPaths)
+        float lowestDistance = 0.0f;
+        Node[] bestPath = AStar(start, goal, out lowestDistance);
+        Node[][] bestPaths = new Node[numPaths][];
+        bestPaths[0] = bestPath;
+        List<Node[]> possiblePaths = new List<Node[]>();
+        List<float> possibleLengths = new List<float>();
+        Node[] currentPath = bestPath;
+        int numPathsFound = 1;
+        while (numPathsFound != numPaths)
         {
-            numPaths = bestPath.Length - 1;
-        }
-        Node[][] paths = new Node[numPaths][];
-        paths[0] = bestPath;
-        for (int i = 1; i < numPaths; ++i)
-        {
-            Node changing = bestPath[i - 1];
-            int pathChanging = checkConnection(changing, bestPath[i]);
-            bestPath[i - 1].connectionLengths[pathChanging] = float.MaxValue;
-            Node[] nextOptimal = optimalPath(start, goal);
-            paths[i] = nextOptimal;
-            changing.connectionLengths[pathChanging] = (changing.transform.position - bestPath[i].transform.position).magnitude;
-        }
-        Node[] optimal = null;
-        float highestWeight = float.MinValue;
-        foreach (Node[] thePath in paths)
-        {
-            float totalWeight = 0.0f;
-            foreach (Node n in thePath)
+            int brokenSpurs = 0;
+            for (int i = 0; i < currentPath.Length - 2; ++i)
             {
-                totalWeight += n.Weight;
+                Node spur = currentPath[i];
+                List<int> indicesChanged = new List<int>();
+                List<float> formerLengths = new List<float>();
+                for (int j = 0; j < spur.connections.Length; ++j)
+                {
+                    Node connection = spur.connections[j].GetComponent<Node>();
+                    bool found = connectionFound(bestPaths, connection, spur);
+                    bool valid = (i > 0) ? !connection.Equals(currentPath[i - 1]) && found : found;
+                    if (valid)
+                    {
+                        indicesChanged.Add(j);
+                        formerLengths.Add(spur.connectionLengths[j]);
+                        spur.connectionLengths[j] = float.MaxValue;
+                    }
+                }
+                bool allMax = true;
+                for (int j = 0; j < spur.connectionLengths.Length; ++j)
+                {
+                    float currentLength = spur.connectionLengths[j];
+                    if (currentLength != float.MaxValue)
+                    {
+                        allMax = false;
+                        break;
+                    }
+                }
+                if (allMax) { 
+                    ++brokenSpurs;
+                    restoreConnections(indicesChanged.ToArray(), formerLengths.ToArray(), spur);
+                    break; 
+                }
+                Node[] addition = AStar(spur, goal, out lowestDistance);
+                Node[] possible = addPaths(i, currentPath, addition);
+                possiblePaths.Add(possible);
+                possibleLengths.Add(lowestDistance);
+                restoreConnections(indicesChanged.ToArray(), formerLengths.ToArray(), spur);
             }
-            if (totalWeight < highestWeight)
+            if (brokenSpurs == currentPath.Length)
             {
-                optimal = thePath;
+                break;
+            }
+            float lowestCost = float.MaxValue;
+            Node[] cheapest = null;
+            for (int i = 0; i < possiblePaths.Count; ++i)
+            {
+                float cost = possibleLengths[i];
+                if (cost < lowestCost)
+                {
+                    lowestCost = cost;
+                    cheapest = possiblePaths[i];
+                }
+            }
+            possiblePaths.Remove(cheapest);
+            bestPaths[numPathsFound++] = cheapest;
+        }
+        return bestPaths;
+    }
+
+    private void restoreConnections(int[] indicesChanged, float[] formerLengths, Node restoring)
+    {
+        for (int j = 0; j < indicesChanged.Length; ++j)
+        {
+            int indice = indicesChanged[j];
+            float formerLength = formerLengths[j];
+            restoring.connectionLengths[indice] = formerLength;
+        }
+    }
+
+    private Node[] mostGoalsPath(Node start, Node goal, int numPaths)
+    {
+        Node[][] options = Yens(start, goal, numPaths);
+        float highestTotalWeight = float.MinValue;
+        Node[] optimal = null;
+        foreach (Node[] path in options)
+        {
+            if (path == null)
+            {
+                continue;
+            }
+            float currentTotalWeight = 0.0f;
+            foreach (Node n in path)
+            {
+                currentTotalWeight += n.Weight;
+            }
+            if (currentTotalWeight > highestTotalWeight)
+            {
+                optimal = path;
+                highestTotalWeight = currentTotalWeight;
             }
         }
         return optimal;
     }
 
-    private int checkConnection(Node a, Node b)
+    private bool connectionFound(Node[][] paths, Node firstNode, Node secondNode)
     {
-        int nodeConnection = 0;
-        for (int i = 0; i < a.connections.Length; ++i) {
-            Node connection = a.connections[i].GetComponent<Node>();
-            if (connection.Equals(b)) { 
-                nodeConnection = i;
-                break;
+        for (int i = 0; i < paths.Length; ++i)
+        {
+            Node[] currentPath = paths[i];
+            if (currentPath == null) { continue; }
+            for (int j = 0; j < currentPath.Length - 1; ++j)
+            {
+                Node first = currentPath[j];
+                Node second = currentPath[j + 1];
+                if ((first.Equals(firstNode) && second.Equals(secondNode)) || (first.Equals(secondNode) && second.Equals(firstNode)))
+                {
+                    return true;
+                }
             }
         }
-        return nodeConnection;
+        return false;
+    }
+
+    private Node[] addPaths(int firstEndpoint, Node[] firstPath, Node[] secondPath)
+    {
+        if (firstPath.Length == 0)
+        {
+            return secondPath;
+        }
+        if (secondPath.Length == 0)
+        {
+            return firstPath;
+        }
+        Node[] result = new Node[firstEndpoint + secondPath.Length];
+        int i = 0;
+        while (i < firstEndpoint) {
+            result[i] = firstPath[i];
+            ++i;
+        }
+        for (int j = 0; j < secondPath.Length; ++j)
+        {
+            result[i++] = secondPath[j];
+        }
+        return result;
     }
 
     private void checkDirection(Vector3 destination)
@@ -247,6 +348,7 @@ public class OptimalTraversal : MonoBehaviour {
         Node[] allNodes = FindObjectsOfType<Node>();
         foreach (Node n in allNodes)
         {
+            n.distance = 0.0f;
             n.origin = null;
         }
     }
