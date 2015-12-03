@@ -10,14 +10,10 @@ public class CameraControl : MonoBehaviour {
     private Transform playerTransform;
     private Transform theTransform;
     private bool using360Controller = false;
+    public bool paused = false;
 
     void Start()
     {
-        //if (OVRManager.isHmdPresent)
-        //{
-        //    Destroy(gameObject);
-        //    return;
-        //}
         playerTransform = player.GetComponent<Transform>();
         theTransform = GetComponent<Transform>();
         foreach (string s in Input.GetJoystickNames())
@@ -29,6 +25,10 @@ public class CameraControl : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        if (paused)
+        {
+            return;
+        }
         float xRotation = 0.0f;
         if (using360Controller)
         {

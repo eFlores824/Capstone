@@ -7,14 +7,18 @@ public class SceneManager : MonoBehaviour {
     public GameObject overScreen;
     public Text endText;
     public MinimapManager miniMapManager;
+    public Canvas pauseScreen;
 
     private InfoManager info;
     private SoundManager sound;
+    private GuardManager headGuard;
     private int goalsReached = 0;
 
     private GuardDetection[] guards;
     private LightPlayer[] lights;
     private Node[] allNodes;
+
+    private bool paused = false;
 
 	// Use this for initialization
 	void Start () {
@@ -23,6 +27,7 @@ public class SceneManager : MonoBehaviour {
         lights = FindObjectsOfType<LightPlayer>();
         allNodes = FindObjectsOfType<Node>();
         sound = GetComponent<SoundManager>();
+        miniMapManager.realStart();
 
         foreach (Node n in allNodes)
         {
@@ -34,7 +39,7 @@ public class SceneManager : MonoBehaviour {
             optimal.realStart();
         }
 
-        GuardManager headGuard = GetComponent<GuardManager>();
+        headGuard = GetComponent<GuardManager>();
         info.realStart();
         headGuard.realStart();
 	}
@@ -62,6 +67,10 @@ public class SceneManager : MonoBehaviour {
             endText.text = "YOU WIN THIS TIME";
             sound.stopFootsteps();
             FindObjectOfType<FirstPersonController>().gameOver = true;
+            foreach (GuardDetection guard in guards)
+            {
+                guard.gameOver = true;
+            }
             overScreen.SetActive(true);
             info.save();
         }
@@ -69,7 +78,6 @@ public class SceneManager : MonoBehaviour {
 
     public void playerFound()
     {
-        GuardDetection[] guards = FindObjectsOfType<GuardDetection>();
         foreach (GuardDetection guard in guards)
         {
             guard.gameOver = true;
@@ -81,8 +89,21 @@ public class SceneManager : MonoBehaviour {
         info.save();
     }
 
-    public void reloadLevel()
+    public void loadLevel(string name)
     {
-        Application.LoadLevel("MainScene");
+        miniMapManager.clearNodeImages();
+        miniMapManager.clearPaths();
+        Application.LoadLevel(name);
     }
+
+    public void togglePause() 
+    {
+        paused = !paused;
+        pauseScreen.gameObject.SetActive(paused);
+        foreach (GuardDetection guard in guards)
+        {
+            guard.paused = paused;
+        }
+    }
+
 }

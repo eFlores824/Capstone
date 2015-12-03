@@ -7,9 +7,12 @@ public class OptimalTraversal : MonoBehaviour {
 
     public Node destination;
     public Node start;
+    public MinimapManager miniMap;
     public float speed;
     public float correctRotation;
     public float maintainedDistance;
+    public bool paused = false;
+    public Color guardColor;
 
     private Node[] path;
     private int currentNode = 0;
@@ -22,6 +25,12 @@ public class OptimalTraversal : MonoBehaviour {
     {
         detector = GetComponent<GuardDetection>();
         theTransform = GetComponent<Transform>();
+        changeGoal(destination);
+    }
+
+    public Vector3 currentPosition()
+    {
+        return theTransform.position;
     }
 
 	// Use this for initialization
@@ -31,7 +40,7 @@ public class OptimalTraversal : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!detector.gameOver)
+        if (!detector.gameOver && !detector.paused)
         {
             if (currentNode < path.Length)
             {
@@ -71,24 +80,13 @@ public class OptimalTraversal : MonoBehaviour {
             return;
         }
         Node beginning;
-        float closestDistance;
         if (currentNode < path.Length)
         {
             beginning = path[currentNode];
-            closestDistance = (beginning.transform.position - goal.transform.position).magnitude;
         }
         else
         {
             beginning = objective.GetComponent<Node>();
-            closestDistance = (objective.transform.position - goal.transform.position).magnitude;
-        }
-        foreach (GameObject obj in beginning.connections)
-        {
-            float distanceFrom = (obj.transform.position - goal.transform.position).magnitude;
-            if (distanceFrom < closestDistance)
-            {
-                beginning = obj.GetComponent<Node>();
-            }
         }
         Node[] newPath = mostGoalsPath(beginning, goal, 3);
         changePath(newPath);
@@ -97,6 +95,7 @@ public class OptimalTraversal : MonoBehaviour {
     private void changePath(Node[] newPath)
     {
         path = newPath;
+        miniMap.drawPath(newPath, guardColor);
         currentNode = 0;
         currentObjective = path[0].transform.position;
         checkDirection(currentObjective);

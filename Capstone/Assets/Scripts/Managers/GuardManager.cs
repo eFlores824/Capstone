@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class GuardManager : MonoBehaviour {
 
+    public MinimapManager miniMap;
+
     private GuardDetection[] guards;
     private InfoManager info;
 
@@ -11,12 +13,18 @@ public class GuardManager : MonoBehaviour {
 	public void realStart () {
         guards = FindObjectsOfType<GuardDetection>();
         info = GetComponent<InfoManager>();
-        Node[] optimalStartingLocations = info.optimalNodes();
-        distributeGuards(optimalStartingLocations);
+        if (InfoManager.loadInfo)
+        {
+            Node[] optimalStartingLocations = info.optimalNodes();
+            distributeGuards(optimalStartingLocations);
+            addNodesToMap(optimalStartingLocations);
+        }
 	}
 
     private void distributeGuards(Node[] destinations)
     {
+        miniMap.clearPaths();
+        miniMap.clearNodeImages();
         List<GuardDetection> guardsChecked = new List<GuardDetection>();
         for (int i = 0; i < destinations.Length; ++i)
         {
@@ -44,33 +52,53 @@ public class GuardManager : MonoBehaviour {
 
     public void distributeOnSound(Node soundHeard)
     {
-        float weightOfNode = soundHeard.Weight;
+        weightedDistribution(soundHeard);
+    }
+
+    private void addNodesToMap(Node[] nodes)
+    {
+        foreach (Node n in nodes)
+        {
+            miniMap.addNodeToMap(n);
+        }
+    }
+
+    private void weightedDistribution(Node root)
+    {
+        float weightOfNode = root.Weight;
         if (weightOfNode > 1)
         {
-            Node[] destinations;     
-            if (weightOfNode >= 5) { destinations = soundHeard.priorityNodes(4); }
-            else if (weightOfNode > 3) { destinations = soundHeard.priorityNodes(3); }
-            else { destinations = soundHeard.priorityNodes(2); }
+            Node[] destinations;
+            if (weightOfNode >= 5) { destinations = root.priorityNodes(4); }
+            else if (weightOfNode > 3) { destinations = root.priorityNodes(3); }
+            else { destinations = root.priorityNodes(2); }
             distributeGuards(destinations);
+            addNodesToMap(destinations);
         }
         else
         {
+            miniMap.clearPaths();
+            miniMap.clearNodeImages();
             GuardDetection closestGuard = null;
             float closest = float.MaxValue;
             foreach (GuardDetection guard in guards)
             {
-                float distance = (guard.transform.position - soundHeard.transform.position).magnitude;
+                float distance = (guard.transform.position - root.transform.position).magnitude;
                 if (distance < closest)
                 {
                     closestGuard = guard;
+                    closest = distance;
                 }
             }
-            closestGuard.GetComponent<OptimalTraversal>().changeGoal(soundHeard);
+            miniMap.addNodeToMap(root);
+            closestGuard.GetComponent<OptimalTraversal>().changeGoal(root);
         }
     }
 
     public void distributeOnAlarm()
     {
-
+        Node nextSpot = info.nextLikelyGoal();
+        nextSpot = info.nearestWeightedNode(nextSpot, 2);
+        weightedDistribution(nextSpot);
     }
 }

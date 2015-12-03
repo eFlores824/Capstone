@@ -5,10 +5,15 @@ public class FirstPersonController : MonoBehaviour {
 
     public GameObject forward;
     public GameObject left;
+    public CameraControl theCamera;
     public SceneManager sceneManager;
     public GuardManager manager;
     public SoundManager sound;
+    public Node[] spawnLocations;
+    public Vector3[] spawnRotations;
+
     public float speed;
+    public float buttonDelay;
     public bool lit = false;
     public bool gameOver = false;
 
@@ -18,10 +23,13 @@ public class FirstPersonController : MonoBehaviour {
     private Rigidbody theRigidBody;
     private GuardDetection[] guards;
     private InfoManager info;
+
     private bool using360Controller = false;
     private bool wasWalking = false;
     private bool walking = false;
-    
+    private bool paused = false;
+    private bool delayingButon = false;
+
     private enum RunningState
     {
         normal, running, silent
@@ -41,7 +49,21 @@ public class FirstPersonController : MonoBehaviour {
         {
             using360Controller = !string.IsNullOrEmpty(s);
         }
+        randomSpawnSpot();
 	}
+
+    private void randomSpawnSpot()
+    {
+        int randomNumber = Random.Range(0, spawnLocations.Length);
+        Node randomNode = spawnLocations[randomNumber];
+        Vector3 nodeLocation = randomNode.transform.position;
+        float formerY = theTransform.position.y;
+        nodeLocation.y = formerY;
+        theTransform.position = nodeLocation;
+        Vector3 startRotation = spawnRotations[randomNumber];
+        theTransform.localEulerAngles = startRotation;
+        theCamera.transform.localEulerAngles = startRotation;
+    }
 
 	// Update is called once per frame
 	void Update () {
@@ -51,10 +73,31 @@ public class FirstPersonController : MonoBehaviour {
         }
         if (using360Controller)
         {
+            if (Input.GetButton("Start") && !delayingButon)
+            {
+                paused = !paused;
+                theCamera.paused = !theCamera.paused;
+                sceneManager.togglePause();
+                StartCoroutine(delayButton());
+            }
+            if (paused)
+            {
+                return;
+            }
             controllerMovement();
         }
         else if (Input.anyKey)
         {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                paused = !paused;
+                theCamera.paused = !theCamera.paused;
+                sceneManager.togglePause();
+            }
+            if (paused)
+            {
+                return;
+            }
             mouseMovement();
         }
         else {
@@ -70,6 +113,18 @@ public class FirstPersonController : MonoBehaviour {
         wasWalking = walking;
 	}
 
+    private IEnumerator delayButton()
+    {
+        delayingButon = true;
+        yield return new WaitForSeconds(buttonDelay);
+        delayingButon = false;
+    }
+
+    public Vector3 getPosition()
+    {
+        return theTransform.position;
+    }
+
     private void controllerMovement()
     {
         Vector3 forwardVector;
@@ -84,11 +139,11 @@ public class FirstPersonController : MonoBehaviour {
             forwardChange *= 2.0f;
             leftChange *= 2.0f;
         }
-        else if (Mathf.Abs(forwardChange) < 0.05f)
+        else if (Input.GetAxis("BackTriggers") >= 0.5f)
         {
             running = RunningState.silent;
-            //forwardChange *= 0.5f;
-            //leftChange *= 0.5f;
+            forwardChange *= 0.5f;
+            leftChange *= 0.5f;
         }
         theTransform.position += forwardVector * forwardChange;
         theTransform.position += leftVector * leftChange;
@@ -164,6 +219,7 @@ public class FirstPersonController : MonoBehaviour {
         {
             sceneManager.goalReached(theGoal);
             sound.playGoalReached();
+            manager.distributeOnAlarm();
         }
     }
 

@@ -6,6 +6,7 @@ using System.Text;
 public class InfoManager : MonoBehaviour {
 
     public static bool loadInfo;
+    public Node[] goals;
 
     private Node[] nodes;
 
@@ -73,6 +74,7 @@ public class InfoManager : MonoBehaviour {
         checkGoals();
         writeNodes();
         writeGoals();
+        loadInfo = true;
     }
 
     private void load()
@@ -304,8 +306,36 @@ public class InfoManager : MonoBehaviour {
         return highestOrder;
     }
 
-    public int[] nextLikelyPattern()
+    private Node chooseRandomNextGoal()
     {
+        int currentGoal = goalReachedOrder[currentGoalIndex - 1];
+        int[] possibleNextGoals = new int[2];
+        if (currentGoal == 1)
+        {
+            possibleNextGoals[0] = goalReachedOrder.Length;
+            possibleNextGoals[1] = 2;
+        }
+        else if (currentGoal == goalReachedOrder.Length)
+        {
+            possibleNextGoals[0] = 1;
+            possibleNextGoals[1] = goalReachedOrder.Length - 1;
+        }
+        else
+        {
+            possibleNextGoals[0] = currentGoal - 1;
+            possibleNextGoals[1] = currentGoal + 1;
+        }
+        int random = Random.Range(0, 2);
+        int randomGoal = possibleNextGoals[random];
+        return goals[randomGoal - 1];
+    }
+
+    public Node nextLikelyGoal()
+    {
+        if (theOrders == null)
+        {
+            return chooseRandomNextGoal();
+        }
         int highestCount = int.MinValue;
         int[] highestOrder = null;
         for (int i = 0; i < theOrders.Length; ++i)
@@ -328,7 +358,8 @@ public class InfoManager : MonoBehaviour {
                 highestOrder = currentOrder;
             }
         }
-        return highestOrder;
+        int nextGoal = highestOrder[currentGoalIndex];
+        return goals[nextGoal - 1];
     }
 
     public Node nearestWeightedNode(Node root, int levelsDeep)

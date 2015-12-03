@@ -3,9 +3,6 @@ using System.Collections;
 
 public class SoundManager : MonoBehaviour {
 
-	public AudioClip walking;
-	public AudioClip goalReached;
-
 	private AudioSource[] sounds;
     private IEnumerator coroutine;
 	
@@ -28,12 +25,13 @@ public class SoundManager : MonoBehaviour {
 	}
 	
 	public void stopAllSound() {
-		StopAllCoroutines();
+        sounds[0].Stop();
+        sounds[1].Stop();
 	}
 
     public void playGoalReached()
     {
-        sounds[0].PlayOneShot(goalReached);
+        sounds[2].Play();
     }
 
 }

@@ -10,6 +10,7 @@ public class GuardDetection : MonoBehaviour {
     public float hearingRange;
     public float hearingDelay;
     public bool gameOver;
+    public bool paused = false;
 
     private Transform playerTransform;
     private Transform forwardTransform;
@@ -28,7 +29,7 @@ public class GuardDetection : MonoBehaviour {
 
     public void realUpdate()
     {
-        if (!gameOver)
+        if (!gameOver && !paused)
         {
             Vector3 forwardVector = forwardTransform.position - theTransform.position;
             Vector3 toPlayerVector = playerTransform.position - theTransform.position;
@@ -48,14 +49,14 @@ public class GuardDetection : MonoBehaviour {
                     }
                 }
             }
-        }
-        if (countingTime)
-        {
-            soundTime += Time.deltaTime;
-            if (soundTime >= hearingDelay)
+            if (countingTime)
             {
-                soundTime = 0.0f;
-                countingTime = false;
+                soundTime += Time.deltaTime;
+                if (soundTime >= hearingDelay)
+                {
+                    soundTime = 0.0f;
+                    countingTime = false;
+                }
             }
         }
     }

@@ -8,6 +8,8 @@ public class Node : MonoBehaviour {
     public float[] connectionLengths;
     
     public int id = 0;
+
+    private Transform theTransform;
     private int soundTriggeredCount = 0;
     private int playerFoundCount = 0;
     private int gameLastTriggered = 0;
@@ -40,6 +42,7 @@ public class Node : MonoBehaviour {
 
     public void realStart()
     {
+        theTransform = GetComponent<Transform>();
         connectionLengths = new float[connections.Length];
         for (int i = 0; i < connections.Length; ++i)
         {
@@ -48,14 +51,20 @@ public class Node : MonoBehaviour {
     }
 
 	// Use this for initialization
-	void Start () {
-        
-	}
+	void Start () 
+    {
+    
+    }
 
 	// Update is called once per frame
 	void Update () {
 	
 	}
+
+    public Vector3 getPosition()
+    {
+        return theTransform.position;
+    }
 
     public GameObject randomNode()
     {
@@ -120,7 +129,10 @@ public class Node : MonoBehaviour {
         bool found = false;
         foreach (Node obj in array)
         {
-            found = obj.Equals(searching)? true: found;
+            if (obj != null)
+            {
+                found = obj.Equals(searching)? true: found;
+            }            
         }
         return found;
     }
